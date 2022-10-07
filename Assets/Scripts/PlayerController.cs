@@ -26,11 +26,13 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         LevelManager.OnGameStarted += SwitchDriveState;
+        LevelManager.OnGameStarted += ChangeInputMapsToTouch;
         OnCorrectTouch += SwitchThrowState;
         OnCorrectTouch += SetReverseRotation;
     }
     private void OnDisable()
     {
+        LevelManager.OnGameStarted -= ChangeInputMapsToTouch;
         LevelManager.OnGameStarted -= SwitchDriveState;
         OnCorrectTouch -= SwitchThrowState;
         OnCorrectTouch -= SetReverseRotation;
@@ -39,7 +41,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
-        playerInput.currentActionMap.FindAction("Touch", true).started += OnTouch;
+
         rotationType = RotationType.AClock;
 
         if (pathCreator != null)
@@ -69,6 +71,17 @@ public class PlayerController : MonoBehaviour
             // gazete daðýlmasý
             // 2 sn sonra fail ekraný gelir
         }
+    }
+
+    public void ChangeInputMapsToTouch()
+    {
+        playerInput.SwitchCurrentActionMap("Touch");
+        playerInput.currentActionMap.FindAction("Touch", true).started += OnTouch;
+    }
+    public void ChangeInputMapsToUI()
+    {
+        playerInput.currentActionMap.FindAction("Touch", true).started -= OnTouch;
+        playerInput.SwitchCurrentActionMap("UI");
     }
 
     public void SwitchThrowState()
