@@ -12,29 +12,33 @@ public class Newspapers : MonoBehaviour
     private void OnEnable()
     {
         PlayerController.OnCorrectTouch += ThrowNewsPapers;
+        LevelManager.OnGameStarted += FillBasket;
     }
     private void OnDisable()
     {
+        LevelManager.OnGameStarted -= FillBasket;
         PlayerController.OnCorrectTouch -= ThrowNewsPapers;
     }
     // Start is called before the first frame update
     private void Start()
     {
-        FillNews(LevelManager.currentNewsPapers);
+        
     }
 
     // put on stack number of newspapers
-    public void FillNews(int number)
+    public void FillBasket()
     {
-        for (int i = 0; i < number; i++)
+        int n = LevelManager.currentNewsPapers;
+        for (int i = 0; i < n; i++)
         {
-            var n =  Instantiate(newPrefab, placePosition.position + new Vector3(0, i * distBetweenNews, 0), newPrefab.transform.rotation, placePosition.transform);
-            newsStack.Add(n);
+            var go =  Instantiate(newPrefab, placePosition.position + new Vector3(0, i * distBetweenNews, 0), newPrefab.transform.rotation, placePosition.transform);
+            newsStack.Add(go);
         }
     }
 
     public void ThrowNewsPapers()
     {
+        Debug.LogWarning("ThrowNewsPapers");
         LevelManager.currentNewsPapers -= 1;
         // gazete posta kutusuna gider
     }
