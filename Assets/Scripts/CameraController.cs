@@ -38,7 +38,7 @@ public class CameraController : MonoBehaviour
             if (!spawnPoint)
                 spawnPoint = spawnPoint = levelManager.hitPointInstance;
 
-            midlePoint = Vector3.Lerp(spawnPoint.transform.position, bike.transform.position, .8f);
+            midlePoint = Vector3.Lerp(spawnPoint.transform.position, bike.transform.position, .5f);
             distBikeSpwnPoint = Vector3.Distance(bike.transform.position, spawnPoint.transform.position) / 15f;
             float speedValue = speedMultipler.Evaluate((Time.realtimeSinceStartup - currentTime) * speed * Time.deltaTime );
             transform.position = 

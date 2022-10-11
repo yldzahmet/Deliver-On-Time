@@ -5,16 +5,17 @@ using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
-    public static int currentLevel = 2;
+    public int currentLevel;
     [SerializeField]
     public static int currentNewsPapers;
     public static bool isCorrectTime = false;
     public static bool isGameStarted = false;
     public GameObject hitPointPrefab;
+    public GameObject succesCanvas;
     internal GameObject hitPointInstance;
     public List<Transform> spawnPoints;
-    private int spawnPoingIndex;
-    private int lastPointIndex;
+    public static int spawnPoingIndex;
+    public static int lastPointIndex;
 
     public Text currentNewsText;
     public string newsString;
@@ -28,15 +29,17 @@ public class LevelManager : MonoBehaviour
     private void OnEnable()
     {
         OnGameStarted += SetVariablesToDefault;
+        OnSucces += OpenSuccesCanvas;
         PlayerController.OnCorrectTouch += GenerateRandomPoint;
-        PlayerController.OnInCorrectTouch += GenerateRandomPoint;
+        PlayerController.OnInCorrectTouch += GenerateRandomPoint; //**** will be deleted
     }
 
     private void OnDisable()
     {
         OnGameStarted -= SetVariablesToDefault;
+        OnSucces -= OpenSuccesCanvas;
         PlayerController.OnCorrectTouch -= GenerateRandomPoint;
-        PlayerController.OnInCorrectTouch -= GenerateRandomPoint;
+        PlayerController.OnInCorrectTouch -= GenerateRandomPoint;   //**** will be deleted
     }
     private void Start()
     {
@@ -46,6 +49,7 @@ public class LevelManager : MonoBehaviour
     {
         if (isGameStarted)
         {
+
             CheckNewsCount();
             currentNewsText.text = newsString + currentNewsPapers.ToString();
         }
@@ -90,13 +94,11 @@ public class LevelManager : MonoBehaviour
         {
             for (int i = 0; i < limitRange; i++)
             {
-                Debug.Log("M : " + Mod(lastPointIndex + i, 8));
                 // not matching restricted point
                 if (spawnPoingIndex != Mod(lastPointIndex + i, 8))
                     continue;
                 // matching restricted point
                 else
-                    Debug.Log("^^^");
                     return false;
             }
             // if not match with all restricted points
@@ -106,13 +108,14 @@ public class LevelManager : MonoBehaviour
         {
             for (int i = 0; i > -limitRange; i--)
             {
-                Debug.Log("M : " + Mod(lastPointIndex + i, 8));
+                // not matching restricted point
                 if (spawnPoingIndex != Mod(lastPointIndex + i, 8))
                     continue;
+                // matching restricted point
                 else
-                    Debug.Log("^^^");
-                return false;
+                    return false;
             }
+            // if not match with all restricted points
             return true;
         }
     }
@@ -123,7 +126,7 @@ public class LevelManager : MonoBehaviour
     public void SetVariablesToDefault()
     {
         isGameStarted = true;
-        currentNewsPapers = currentLevel;
+        currentNewsPapers = currentLevel + 9;
     }
 
     public void CheckNewsCount()
@@ -132,8 +135,18 @@ public class LevelManager : MonoBehaviour
             return;
         else
         {
-            //OnSucces();
-            //Debug.Log("Level Succes Completed");
+            OnSucces();
         }
+    }
+
+    public void OpenSuccesCanvas()
+    {
+        //succesCanvas.SetActive(true);
+        Debug.Log("Level Succes Completed");
+    }
+    public void SetValuesForNewLevel()
+    {
+        isGameStarted = false;
+        currentLevel += 1;
     }
 }

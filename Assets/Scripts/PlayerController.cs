@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using PathCreation;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    public InputField speedInput;
     public PathCreator pathCreator;
     private PlayerInput playerInput;
     public GameObject bike;
@@ -29,8 +31,8 @@ public class PlayerController : MonoBehaviour
         LevelManager.OnGameStarted += ChangeInputMapsToTouch;
         OnCorrectTouch += SwitchThrowState;
         OnCorrectTouch += SetReverseRotation;
-        OnInCorrectTouch += SwitchThrowState;
-        OnInCorrectTouch += SetReverseRotation;
+        OnInCorrectTouch += SwitchThrowState;   //**** will be deleted
+        OnInCorrectTouch += SetReverseRotation; //**** will be deleted
     }
     private void OnDisable()
     {
@@ -38,8 +40,8 @@ public class PlayerController : MonoBehaviour
         LevelManager.OnGameStarted -= SwitchDriveState;
         OnCorrectTouch -= SwitchThrowState;
         OnCorrectTouch -= SetReverseRotation;
-        OnInCorrectTouch -= SwitchThrowState;
-        OnInCorrectTouch -= SetReverseRotation;
+        OnInCorrectTouch -= SwitchThrowState;   //**** will be deleted
+        OnInCorrectTouch -= SetReverseRotation; //**** will be deleted
     }
     // Start is called before the first frame update
     void Start()
@@ -87,13 +89,21 @@ public class PlayerController : MonoBehaviour
         playerInput.SwitchCurrentActionMap("UI");
     }
 
+    public void PlayThrowAnimation()
+    {
+
+        Animator animator = throwNews.GetComponent<Animator>();
+        int animId = Animator.StringToHash("Throw");
+        animator.Play(animId, 0, 0);
+    
+    }
     public void SwitchThrowState()
     {
+        CancelInvoke();
         Debug.LogWarning("SwitchThrowState");
         drive.SetActive(false);
         throwNews.SetActive(true);
-        Animator animator = throwNews.GetComponent<Animator>();
-        animator.Play("Throw");
+        PlayThrowAnimation();
         Invoke("SwitchDriveState", .8f);
     }
     public void SwitchDriveState()
