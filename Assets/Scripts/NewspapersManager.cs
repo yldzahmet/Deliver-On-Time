@@ -24,7 +24,7 @@ public class NewspapersManager : MonoBehaviour
     // put on stack number of newspapers
     public void FillBasket()
     {
-        int n = LevelManager.currentNewsPapers;
+        int n = LevelManager.currentPapers;
         for (int i = 0; i < n; i++)
         {
             var go =  Instantiate(newsPrefab, placePosition.position + new Vector3(0, i * distBetweenNews, 0), newsPrefab.transform.rotation, placePosition.transform);
@@ -46,7 +46,7 @@ public class NewspapersManager : MonoBehaviour
                 .MoveToMailBox(mailBox[LevelManager.lastPointIndex]);   // start to move with its own method
             newsList.RemoveAt(index);  // remove from list
 
-            LevelManager.currentNewsPapers -= 1;
+            LevelManager.currentPapers -= 1;
         }
 
     }

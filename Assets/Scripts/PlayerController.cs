@@ -23,12 +23,13 @@ public class PlayerController : MonoBehaviour
     public static System.Action OnInCorrectTouch;
 
     [SerializeField]
-    float distanceTravelled;
+    internal float distanceTravelled;
 
     private void OnEnable()
     {
         LevelManager.OnGameStarted += SwitchDriveState;
         LevelManager.OnGameStarted += ChangeInputMapsToTouch;
+        LevelManager.OnSucces += ChangeInputMapsToUI;
         OnCorrectTouch += SwitchThrowState;
         OnCorrectTouch += SetReverseRotation;
         OnInCorrectTouch += SwitchThrowState;   //**** will be deleted
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         LevelManager.OnGameStarted -= ChangeInputMapsToTouch;
         LevelManager.OnGameStarted -= SwitchDriveState;
+        LevelManager.OnSucces -= ChangeInputMapsToUI;
         OnCorrectTouch -= SwitchThrowState;
         OnCorrectTouch -= SetReverseRotation;
         OnInCorrectTouch -= SwitchThrowState;   //**** will be deleted
@@ -65,7 +67,6 @@ public class PlayerController : MonoBehaviour
         if (LevelManager.isCorrectTime)
         {
             OnCorrectTouch();
-            // stacktan gazete eksilmesi
         }
         else
         {
@@ -88,7 +89,14 @@ public class PlayerController : MonoBehaviour
         playerInput.currentActionMap.FindAction("Touch", true).started -= OnTouch;
         playerInput.SwitchCurrentActionMap("UI");
     }
+    public void PlayIdleState()
+    {
 
+        Animator animator = throwNews.GetComponent<Animator>();
+        int animId = Animator.StringToHash("Idle");
+        animator.Play(animId, 0, 0);
+
+    }
     public void PlayThrowAnimation()
     {
 

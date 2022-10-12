@@ -26,7 +26,7 @@ public class NewsPaper : MonoBehaviour
             Vector3.MoveTowards(
                 transform.position,
                 box.transform.position + offset,
-                10 * Time.deltaTime);
+                15 * Time.deltaTime);
         }
     }
 }

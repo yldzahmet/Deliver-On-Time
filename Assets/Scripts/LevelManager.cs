@@ -5,19 +5,23 @@ using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
+    public static int levelGoal;
+    public static int currentPapers;
     public int currentLevel;
-    [SerializeField]
-    public static int currentNewsPapers;
     public static bool isCorrectTime = false;
     public static bool isGameStarted = false;
+    public static int spawnPoingIndex;
+    public static int lastPointIndex;
+
+    public GameObject bikeFollower;
     public GameObject hitPointPrefab;
     public GameObject succesCanvas;
     internal GameObject hitPointInstance;
     public List<Transform> spawnPoints;
-    public static int spawnPoingIndex;
-    public static int lastPointIndex;
 
     public Text currentNewsText;
+    public Text levelGoalText;
+    public Text nextLevelGoalText;
     public string newsString;
 
     public static Action OnGameStarted;
@@ -28,22 +32,21 @@ public class LevelManager : MonoBehaviour
 
     private void OnEnable()
     {
-        OnGameStarted += SetVariablesToDefault;
-        OnSucces += OpenSuccesCanvas;
+        OnGameStarted += StartGame;
+        OnSucces += LevelCompleted;
         PlayerController.OnCorrectTouch += GenerateRandomPoint;
-        PlayerController.OnInCorrectTouch += GenerateRandomPoint; //**** will be deleted
+        //PlayerController.OnInCorrectTouch += GenerateRandomPoint; //**** will be deleted
     }
 
     private void OnDisable()
     {
-        OnGameStarted -= SetVariablesToDefault;
-        OnSucces -= OpenSuccesCanvas;
+        OnGameStarted -= StartGame;
+        OnSucces -= LevelCompleted;
         PlayerController.OnCorrectTouch -= GenerateRandomPoint;
-        PlayerController.OnInCorrectTouch -= GenerateRandomPoint;   //**** will be deleted
+        //PlayerController.OnInCorrectTouch -= GenerateRandomPoint;   //**** will be deleted
     }
     private void Start()
     {
-        GenerateRandomPoint();
     }
     private void Update()
     {
@@ -51,8 +54,10 @@ public class LevelManager : MonoBehaviour
         {
 
             CheckNewsCount();
-            currentNewsText.text = newsString + currentNewsPapers.ToString();
+            currentNewsText.text = newsString + currentPapers.ToString();
         }
+        levelGoalText.text = levelGoal.ToString() + " / " + levelGoal.ToString();
+        nextLevelGoalText.text = levelGoal.ToString();
     }
 
     public static int Mod(int k, int n) 
@@ -86,9 +91,9 @@ public class LevelManager : MonoBehaviour
     public bool GetValidSpawnPoint(int limitRange)
     {
         spawnPoingIndex = UnityEngine.Random.Range(0, 8);
-        Debug.Log("\n");
-        Debug.Log("Lp: " + lastPointIndex);
-        Debug.Log("Nsp--------: " + spawnPoingIndex);
+        //Debug.Log("\n");
+        //Debug.Log("Lp: " + lastPointIndex);
+        //Debug.Log("Nsp--------: " + spawnPoingIndex);
 
         if (PlayerController.rotationType == PlayerController.RotationType.Clock)
         {
@@ -123,15 +128,32 @@ public class LevelManager : MonoBehaviour
     {
         OnGameStarted();
     }
-    public void SetVariablesToDefault()
+    public void StartGame()
     {
+        GenerateRandomPoint();
+        SetVarsDefGameStart();
+        SetLevelGoals();
         isGameStarted = true;
-        currentNewsPapers = currentLevel + 9;
+    }
+    public void SetVarsDefGameStart()
+    {
+        PlayerController playerController;
+        playerController = bikeFollower.GetComponent<PlayerController>();
+        playerController.distanceTravelled = 0; // reset players position to begining
+        playerController.speed = currentLevel * 2 + 15;
+        spawnPoingIndex = 0;
+        lastPointIndex = 0;
+    }
+    public void SetLevelGoals()
+    {
+        currentPapers = currentLevel * 2;
+        levelGoal = currentPapers;
+        Debug.Log("SLG: " + levelGoal);
     }
 
     public void CheckNewsCount()
     {
-        if (currentNewsPapers > 0)
+        if (currentPapers > 0)
             return;
         else
         {
@@ -139,14 +161,31 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void OpenSuccesCanvas()
+    public void LevelCompleted()
     {
-        //succesCanvas.SetActive(true);
         Debug.Log("Level Succes Completed");
-    }
-    public void SetValuesForNewLevel()
-    {
         isGameStarted = false;
+        bikeFollower.GetComponent<PlayerController>().PlayIdleState();
+        succesCanvas.SetActive(true);
         currentLevel += 1;
+        if (hitPointInstance)
+            Destroy(hitPointInstance);
     }
+
+
+    public void GetUserPrefs()
+    {
+        currentLevel = PlayerPrefs.GetInt("Level");
+    }
+
+    public void SetUserPrefs()
+    {
+        PlayerPrefs.SetInt("Level", currentLevel);
+    }
+
+    public void DeleteUserData()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
 }
