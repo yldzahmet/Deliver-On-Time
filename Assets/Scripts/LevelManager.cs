@@ -196,6 +196,8 @@ public class LevelManager : MonoBehaviour
         bikeFollower.SetActive(false);
         if (hitPointInstance)
             Destroy(hitPointInstance);
+        Vibrator.Vibrate();
+
     }
 
     public void GetUserPrefs()

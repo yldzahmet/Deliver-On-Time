@@ -62,6 +62,7 @@ public class NewspapersManager : MonoBehaviour
             newsList.RemoveAt(index);  // remove from list
             LevelManager.currentPapers -= 1;
             LevelManager.currentThrowedPapers += 1;
+            Vibrator.Vibrate();
         }
     }
 }
