@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class SpawnPoints : MonoBehaviour
 {
+    private bool ableSelfDisappear = true;
+    private Animator animator;
+    private void OnEnable()
+    {
+        animator = GetComponent<Animator>();
+        PlayerController.OnCorrectTouch += PlayDisappearAnim;
+    }
+    private void OnDisable()
+    {
+        PlayerController.OnCorrectTouch -= PlayDisappearAnim;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Player"))
@@ -13,9 +24,16 @@ public class SpawnPoints : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && ableSelfDisappear)
         {
             LevelManager.isCorrectTime = false;
+            PlayerController.OnInCorrectTouch();
         }
+    }
+
+    private void PlayDisappearAnim()
+    {
+        ableSelfDisappear = false;
+        animator.Play("Disappear");
     }
 }

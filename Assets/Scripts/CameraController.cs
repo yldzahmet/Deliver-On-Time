@@ -22,7 +22,6 @@ public class CameraController : MonoBehaviour
 
     public void GetCurrentTime()
     {
-        Debug.LogWarning("GetCurrentTime");
         currentTime = Time.realtimeSinceStartup;
     }
     private void Start()

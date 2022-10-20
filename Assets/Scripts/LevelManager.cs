@@ -2,38 +2,50 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class LevelManager : MonoBehaviour
 {
+    public static int currentLevel = 1;
     public static int levelGoal;
     public static int currentPapers;
-    public int currentLevel;
+    public static int currentThrowedPapers;
     public static bool isCorrectTime = false;
     public static bool isGameStarted = false;
     public static int spawnPoingIndex;
     public static int lastPointIndex;
 
+    public AnimationCurve speedCurve;
+    public AnimationCurve paperCountCurve;
     public GameObject bikeFollower;
     public GameObject hitPointPrefab;
     public GameObject succesCanvas;
+    public GameObject inGameCanvas;
+    public GameObject failCanvas;
     internal GameObject hitPointInstance;
-    public List<Transform> spawnPoints;
+    public List<float> spawnPoints;
 
-    public Text currentNewsText;
-    public Text levelGoalText;
-    public Text nextLevelGoalText;
+    public TextMeshProUGUI level_tmp;
+    public TextMeshProUGUI currentNewsText_tmp;
+    public TextMeshProUGUI currentThrowedPapers_tmp;
+    public TextMeshProUGUI levelGoalText_tmp;
+
     public string newsString;
 
     public static Action OnGameStarted;
     public static Action OnSucces;
-    public static Action OnFailed;
 
     public int limitRange;
 
+    private void Awake()
+    {
+        GetUserPrefs();
+    }
     private void OnEnable()
     {
         OnGameStarted += StartGame;
         OnSucces += LevelCompleted;
+        PlayerController.OnInCorrectTouch += FailedTask;
         PlayerController.OnCorrectTouch += GenerateRandomPoint;
         //PlayerController.OnInCorrectTouch += GenerateRandomPoint; //**** will be deleted
     }
@@ -42,6 +54,7 @@ public class LevelManager : MonoBehaviour
     {
         OnGameStarted -= StartGame;
         OnSucces -= LevelCompleted;
+        PlayerController.OnInCorrectTouch -= FailedTask;
         PlayerController.OnCorrectTouch -= GenerateRandomPoint;
         //PlayerController.OnInCorrectTouch -= GenerateRandomPoint;   //**** will be deleted
     }
@@ -54,10 +67,11 @@ public class LevelManager : MonoBehaviour
         {
 
             CheckNewsCount();
-            currentNewsText.text = newsString + currentPapers.ToString();
+            currentNewsText_tmp.text = newsString + currentPapers.ToString();
         }
-        levelGoalText.text = levelGoal.ToString() + " / " + levelGoal.ToString();
-        nextLevelGoalText.text = levelGoal.ToString();
+        level_tmp.text = "Level " + currentLevel.ToString();
+        levelGoalText_tmp.text = levelGoal.ToString() + " / " + levelGoal.ToString();
+        currentThrowedPapers_tmp.text = currentThrowedPapers.ToString() + " / " + levelGoal.ToString();
     }
 
     public static int Mod(int k, int n) 
@@ -67,11 +81,10 @@ public class LevelManager : MonoBehaviour
 
     public void GenerateRandomPoint()
     {
-        Debug.LogWarning("GenerateRandomPoint");
         if (hitPointInstance)
         {
             isCorrectTime = false;
-            Destroy(hitPointInstance);
+            Destroy(hitPointInstance, .2f);
         }
         bool done = false;
         lastPointIndex = spawnPoingIndex;
@@ -85,17 +98,17 @@ public class LevelManager : MonoBehaviour
                 done = GetValidSpawnPoint(limitRange);
         } 
 
-        hitPointInstance = Instantiate(hitPointPrefab, spawnPoints[spawnPoingIndex].position,Quaternion.identity);
+        hitPointInstance = Instantiate(
+            hitPointPrefab, 
+            hitPointPrefab.transform.position,
+            Quaternion.Euler(0, spawnPoints[spawnPoingIndex], 0));
     }
 
     public bool GetValidSpawnPoint(int limitRange)
     {
         spawnPoingIndex = UnityEngine.Random.Range(0, 8);
-        //Debug.Log("\n");
-        //Debug.Log("Lp: " + lastPointIndex);
-        //Debug.Log("Nsp--------: " + spawnPoingIndex);
 
-        if (PlayerController.rotationType == PlayerController.RotationType.Clock)
+        if (PlayerController.rotationType == PlayerController.RotationType.AClock)
         {
             for (int i = 0; i < limitRange; i++)
             {
@@ -134,21 +147,20 @@ public class LevelManager : MonoBehaviour
         SetVarsDefGameStart();
         SetLevelGoals();
         isGameStarted = true;
+        inGameCanvas.SetActive(true);
     }
     public void SetVarsDefGameStart()
     {
-        PlayerController playerController;
-        playerController = bikeFollower.GetComponent<PlayerController>();
-        playerController.distanceTravelled = 0; // reset players position to begining
-        playerController.speed = currentLevel * 2 + 15;
+        GetComponent<PlayerController>().SetDefaultOrientation();
+        bikeFollower.SetActive(true);
+        currentThrowedPapers = 0;
         spawnPoingIndex = 0;
         lastPointIndex = 0;
     }
     public void SetLevelGoals()
     {
-        currentPapers = currentLevel * 2;
+        currentPapers = Mathf.FloorToInt(paperCountCurve.Evaluate(currentLevel));
         levelGoal = currentPapers;
-        Debug.Log("SLG: " + levelGoal);
     }
 
     public void CheckNewsCount()
@@ -165,17 +177,33 @@ public class LevelManager : MonoBehaviour
     {
         Debug.Log("Level Succes Completed");
         isGameStarted = false;
-        bikeFollower.GetComponent<PlayerController>().PlayIdleState();
+        bikeFollower.SetActive(false);
+        inGameCanvas.SetActive(false);
         succesCanvas.SetActive(true);
         currentLevel += 1;
         if (hitPointInstance)
             Destroy(hitPointInstance);
+
+        SetUserPrefs();
     }
 
 
+    public void FailedTask()
+    {
+        isGameStarted = false;
+        failCanvas.SetActive(true);
+        inGameCanvas.SetActive(false);
+        bikeFollower.SetActive(false);
+        if (hitPointInstance)
+            Destroy(hitPointInstance);
+    }
+
     public void GetUserPrefs()
     {
-        currentLevel = PlayerPrefs.GetInt("Level");
+        if (PlayerPrefs.HasKey("Level"))
+            currentLevel = PlayerPrefs.GetInt("Level");
+        else
+            currentLevel = 1;
     }
 
     public void SetUserPrefs()
@@ -186,6 +214,7 @@ public class LevelManager : MonoBehaviour
     public void DeleteUserData()
     {
         PlayerPrefs.DeleteAll();
+        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(0, UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
 
 }

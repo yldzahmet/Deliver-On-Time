@@ -15,7 +15,7 @@ public class NewsPaper : MonoBehaviour
         this.box = box;
         GetComponent<TrailRenderer>().enabled = true;
         startedToMove = true;
-        Destroy(this, 2f);
+        Destroy(this.gameObject, 0.8f);
     }
 
     private void Update()
@@ -26,7 +26,7 @@ public class NewsPaper : MonoBehaviour
             Vector3.MoveTowards(
                 transform.position,
                 box.transform.position + offset,
-                15 * Time.deltaTime);
+                20 * Time.deltaTime);
         }
     }
 }
