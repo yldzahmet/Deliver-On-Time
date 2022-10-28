@@ -15,7 +15,7 @@ public class SuccesScreen : MonoBehaviour
 
     public void InvokeGreetAnim()
     {
-        Invoke("PlayGreetingAnim", 0.15f);
+        Invoke("PlayGreetingAnim", .5f);
     }
 
     private void PlayGreetingAnim()

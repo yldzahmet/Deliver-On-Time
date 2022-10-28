@@ -11,17 +11,22 @@ public static class Vibrator
     public static AndroidJavaClass unityPlayer;
     public static AndroidJavaObject currentActivity;
     public static AndroidJavaObject vibrator;
+
+    
 #endif
 
     public static void Vibrate(long milliseconds = 5)
     {
-        if (isAndroid())
+        if (LevelManager.isVibrationAllowed)
         {
-            vibrator.Call("vibrate", milliseconds);
-        }
-        else
-        {
-            Handheld.Vibrate();
+            if (isAndroid())
+            {
+                vibrator.Call("vibrate", milliseconds);
+            }
+            else
+            {
+                Handheld.Vibrate();
+            }
         }
     }
 

@@ -27,7 +27,13 @@ public class SpawnPoints : MonoBehaviour
         if (other.CompareTag("Player") && ableSelfDisappear)
         {
             LevelManager.isCorrectTime = false;
-            PlayerController.OnInCorrectTouch();
+
+            if (LevelManager.gameMode == LevelManager.LevelMode.Infinite &&
+                LevelManager.currentThrowedPapers != 0 &&
+                LevelManager.CheckIsNewHighScore(LevelManager.currentThrowedPapers))
+                LevelManager.OnSucces();
+            else
+                PlayerController.OnInCorrectTouch();
         }
     }
 
