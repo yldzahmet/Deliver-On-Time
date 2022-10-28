@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public EndOfPathInstruction endOfPathInstruction;
     private float speedMultipler = 1;
     public static float speed = 5;
+    public static float slowingSpeedModifier;
     public bool isFalling = false;
     public enum RotationType { Clock, AClock};
     public static RotationType rotationType;
