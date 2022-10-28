@@ -207,6 +207,7 @@ public class LevelManager : MonoBehaviour
     {
         PlayerController pc = GetComponent<PlayerController>();
         pc.SetDefaultOrientation();
+        pc.isFalling = false;
         pc.bikeFollower.SetActive(true);
 
         inSuccesDeliveredText_tmp.text = delivered_str;
