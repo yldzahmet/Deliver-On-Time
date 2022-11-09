@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class LevelManager : MonoBehaviour
