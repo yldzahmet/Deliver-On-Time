@@ -21,7 +21,7 @@ namespace Unity.Advertisement.IosSupport.Components
 
         public void RequestAuthorizationTracking()
         {
-#if UNITY_IOS 
+#if UNITY_IOS
             Debug.Log("Unity iOS Support: Requesting iOS App Tracking Transparency native dialog.");
 
             ATTrackingStatusBinding.RequestAuthorizationTracking(AuthorizationTrackingReceived);

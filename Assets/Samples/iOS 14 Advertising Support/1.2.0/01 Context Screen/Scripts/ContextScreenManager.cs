@@ -1,9 +1,8 @@
 ﻿using Unity.Advertisement.IosSupport.Components;
 using UnityEngine;
 using System;
-#if UNITY_IOS
 using UnityEngine.iOS;
-#endif
+
 namespace Unity.Advertisement.IosSupport.Samples
 {
     /// <summary>
@@ -17,39 +16,22 @@ namespace Unity.Advertisement.IosSupport.Samples
         /// The prefab has to have an ContextScreenView component on its root GameObject.
         /// </summary>
         public ContextScreenView contextScreenPrefab;
-        private bool isATStatusSaved = false;
-        private void Awake()
-        {
-#if UNITY_IOS
-            if (PlayerPrefs.HasKey("ATStatus"))
-                isATStatusSaved = true;
-            else
-                isATStatusSaved = false;
-#endif
-        }
 
         void Start()
         {
-#if UNITY_IOS 
-            if (!isATStatusSaved)
+#if UNITY_IOS
+            // check with iOS to see if the user has accepted or declined tracking
+            var status = ATTrackingStatusBinding.GetAuthorizationTrackingStatus();
+            Version currentVersion = new Version(Device.systemVersion); 
+            Version ios14 = new Version("14.5"); 
+           
+            if (status == ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED && currentVersion >= ios14)
             {
-                // check with iOS to see if the user has accepted or declined tracking
-                var status = ATTrackingStatusBinding.GetAuthorizationTrackingStatus();
-                //Version currentVersion = new Version(Device.systemVersion);
-                //Version ios14 = new Version("14.5");
+                var contextScreen = Instantiate(contextScreenPrefab).GetComponent<ContextScreenView>();
 
-                if (status == ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED /* && currentVersion >= ios14*/ )
-                {
-                    var contextScreen = Instantiate(contextScreenPrefab).GetComponent<ContextScreenView>();
-
-                    // after the Continue button is pressed, and the tracking request
-                    // has been sent, automatically destroy the popup to conserve memory
-                    contextScreen.sentTrackingAuthorizationRequest += () =>
-                    {
-                        PlayerPrefs.SetString("ATStatus", status.ToString());
-                        Destroy(contextScreen.gameObject);
-                    };
-                }
+                // after the Continue button is pressed, and the tracking request
+                // has been sent, automatically destroy the popup to conserve memory
+                contextScreen.sentTrackingAuthorizationRequest += () => Destroy(contextScreen.gameObject);
             }
 #else
             Debug.Log("Unity iOS Support: App Tracking Transparency status not checked, because the platform is not iOS.");
